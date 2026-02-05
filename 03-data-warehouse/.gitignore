@@ -212,3 +212,5 @@ __marimo__/
 # .env files
 .env
 .env_encoded
+
+*.json
