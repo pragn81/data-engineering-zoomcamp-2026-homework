@@ -47,7 +47,12 @@ Create a (regular/materialized) table in BQ using the Yellow Taxi Trip Records (
 
 What is count of records for the 2024 Yellow Taxi Data?
 
-**Answer:**
+**Answer: 20,332,093**
+
+```sql
+SELECT COUNT(*)
+FROM de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular
+```
 
 ## Question 2. Data read estimation
 
@@ -55,7 +60,15 @@ Write a query to count the distinct number of PULocationIDs for the entire datas
  
 What is the **estimated amount** of data that will be read when this query is executed on the External Table and the Table?
 
-**Answer:**
+**Answer: 0 MB for the External Table and 155.12 MB for the Materialized Table**
+
+```sql
+SELECT COUNT(DISTINCT(PULocationID))
+FROM de-zoomcamp-module3-486515.taxi_rides.external_yellow_tripdata;
+
+SELECT COUNT(DISTINCT(PULocationID))
+FROM de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular;
+```
 
 ## Question 3. Understanding columnar storage
 
@@ -63,19 +76,42 @@ Write a query to retrieve the PULocationID from the table (not the external tabl
 
 Why are the estimated number of Bytes different?
 
-**Answer:**
+**Answer: BigQuery is a columnar database, and it only scans the specific columns requested in the query. Querying two columns (PULocationID, DOLocationID) requires reading more data than querying one column (PULocationID), leading to a higher estimated number of bytes processed.**
+
+```sql
+-- 155.12 MB
+SELECT PULocationID
+FROM de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular;
+
+-- 310.24 MB
+SELECT PULocationID, DOLocationID
+FROM de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular;
+```
 
 ## Question 4. Counting zero fare trips
 
 How many records have a fare_amount of 0?
 
-**Answer:**
+**Answer: 8,333**
+
+```sql
+SELECT count(*)
+FROM de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular
+WHERE fare_amount = 0;
+```
 
 ## Question 5. Partitioning and clustering
 
 What is the best strategy to make an optimized table in Big Query if your query will always filter based on tpep_dropoff_datetime and order the results by VendorID (Create a new table with this strategy)
 
-**Answer:**
+**Answer: Partition by tpep_dropoff_datetime and Cluster on VendorID**
+
+```sql
+CREATE OR REPLACE TABLE de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular_part_clus
+PARTITION BY DATE(tpep_dropoff_datetime)
+CLUSTER BY VendorID AS
+SELECT * FROM de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular;
+```
 
 ## Question 6. Partition benefits
 
@@ -88,22 +124,40 @@ Use the materialized table you created earlier in your from clause and note the 
 
 Choose the answer which most closely matches.
  
-**Answer:**
+**Answer: 310.24 MB for non-partitioned table and 26.84 MB for the partitioned table**
+
+```sql
+-- 310.24 MB
+SELECT distinct(VendorID)
+FROM de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular
+WHERE tpep_dropoff_datetime >= '2024-03-01'
+  AND tpep_dropoff_datetime < '2024-03-16';
+
+-- 26.84 MB
+SELECT distinct(VendorID)
+FROM de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular_part_clus
+WHERE DATE(tpep_dropoff_datetime) BETWEEN '2024-03-01' AND '2024-03-15';
+```
 
 ## Question 7. External table storage
 
 Where is the data stored in the External Table you created?
 
-**Answer:**
+**Answer: GCP Bucket**
 
 ## Question 8. Clustering best practices
 
 It is best practice in Big Query to always cluster your data:
 
-**Answer:**
+**Answer: False**
 
 ## Question 9. Understanding table scans
 
 No Points: Write a `SELECT count(*)` query FROM the materialized table you created. How many bytes does it estimate will be read? Why?
 
-**Answer:**
+**Answer: 0 bytes, because BigQuery retrieves this value from the table metadata**
+
+```sql
+SELECT count(*)
+FROM de-zoomcamp-module3-486515.taxi_rides.yellow_tripdata_regular
+```
