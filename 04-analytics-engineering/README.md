@@ -102,5 +102,15 @@ What is the count of records in `stg_fhv_tripdata`?
 
 **Answer: 43,244,693**
 
+Ingest FHV data with the new script: [ingest_fhv_data.py](taxi_rides_ny/ingest_fhv_data.py)
+
+Create the staging model stg_fhv_tripdata: [stg_fhv_tripdata.sql](taxi_rides_ny/models/staging/stg_fhv_tripdata.sql)
+
 ![q6_1](img/question6_1.png)
+
+Run on prod target:
+```
+dbt run --select stg_fhv_tripdata --target prod
+```
+
 ![q6_2](img/question6_2.png)
