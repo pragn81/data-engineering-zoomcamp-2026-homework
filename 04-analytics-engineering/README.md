@@ -29,10 +29,7 @@ models/
 
 If you run `dbt run --select int_trips_unioned`, what models will be built?
 
-- `stg_green_tripdata`, `stg_yellow_tripdata`, and `int_trips_unioned` (upstream dependencies)
-- Any model with upstream and downstream dependencies to `int_trips_unioned`
-- `int_trips_unioned` only
-- `int_trips_unioned`, `int_trips`, and `fct_trips` (downstream dependencies)
+**Answer: int_trips_unioned only**
 
 ---
 
@@ -54,10 +51,7 @@ Your model `fct_trips` has been running successfully for months. A new value `6`
 
 What happens when you run `dbt test --select fct_trips`?
 
-- dbt will skip the test because the model didn't change
-- dbt will fail the test, returning a non-zero exit code
-- dbt will pass the test with a warning about the new value
-- dbt will update the configuration to include the new value
+**Answer: dbt will fail the test, returning a non-zero exit code**
 
 ---
 
@@ -67,10 +61,9 @@ After running your dbt project, query the `fct_monthly_zone_revenue` model.
 
 What is the count of records in the `fct_monthly_zone_revenue` model?
 
-- 12,998
-- 14,120
-- 12,184
-- 15,421
+**Answer: 12,184**
+
+![q3](img/question3.png)
 
 ---
 
@@ -80,10 +73,9 @@ Using the `fct_monthly_zone_revenue` table, find the pickup zone with the **high
 
 Which zone had the highest revenue?
 
-- East Harlem North
-- Morningside Heights
-- East Harlem South
-- Washington Heights South
+**Answer: East Harlem North**
+
+![q4](img/question4.png)
 
 ---
 
@@ -91,10 +83,9 @@ Which zone had the highest revenue?
 
 Using the `fct_monthly_zone_revenue` table, what is the **total number of trips** (`total_monthly_trips`) for Green taxis in October 2019?
 
-- 500,234
-- 350,891
-- 384,624
-- 421,509
+**Answer: 384,624**
+
+![q5](img/question5.png)
 
 ---
 
@@ -109,7 +100,7 @@ Create a staging model for the **For-Hire Vehicle (FHV)** trip data for 2019.
 
 What is the count of records in `stg_fhv_tripdata`?
 
-- 42,084,899
-- 43,244,693
-- 22,998,722
-- 44,112,187
+**Answer: 43,244,693**
+
+![q6_1](img/question6_1.png)
+![q6_2](img/question6_2.png)
