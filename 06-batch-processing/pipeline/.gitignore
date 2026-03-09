@@ -1,0 +1,12 @@
+.env
+data/
+zones/
+hwdata/
+fhvhv/
+*.gz
+*.csv
+*.json
+lib/
+*part*
+tmp/
+.ipynb_checkpoints/
