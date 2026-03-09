@@ -22,7 +22,7 @@ What's the output?
 > [!NOTE]
 > To install PySpark follow this [guide](https://github.com/DataTalksClub/data-engineering-zoomcamp/blob/main/06-batch/setup/)
 
-**Answer:** Spark version: 3.5.8
+**Answer:** '3.5.8'
 
 ## Question 2: Yellow November 2025
 
