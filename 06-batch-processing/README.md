@@ -8,6 +8,7 @@ For this homework we will be using the Yellow 2025-11 data from the official web
 wget https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2025-11.parquet
 ```
 
+> Jupyter homework notebook [link](pipeline/notebooks/homework.ipynb)
 
 ## Question 1: Install Spark and PySpark
 
