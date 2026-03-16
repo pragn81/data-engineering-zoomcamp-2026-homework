@@ -6,11 +6,14 @@ def create_processed_events_sink_postgres(t_env):
     table_name = 'processed_events'
     sink_ddl = f"""
         CREATE TABLE {table_name} (
+            pickup_datetime TIMESTAMP, 
+            dropoff_datetime TIMESTAMP,
             PULocationID INTEGER,
             DOLocationID INTEGER,
+            passenger_count INTEGER,
             trip_distance DOUBLE,
-            total_amount DOUBLE,
-            pickup_datetime TIMESTAMP
+            tip_amount DOUBLE,
+            total_amount DOUBLE
         ) WITH (
             'connector' = 'jdbc',
             'url' = 'jdbc:postgresql://postgres:5432/postgres',
@@ -28,15 +31,18 @@ def create_events_source_kafka(t_env):
     table_name = "events"
     source_ddl = f"""
         CREATE TABLE {table_name} (
+            pickup_datetime BIGINT, 
+            dropoff_datetime BIGINT,
             PULocationID INTEGER,
             DOLocationID INTEGER,
+            passenger_count INTEGER,
             trip_distance DOUBLE,
-            total_amount DOUBLE,
-            tpep_pickup_datetime BIGINT
+            tip_amount DOUBLE,
+            total_amount DOUBLE
         ) WITH (
             'connector' = 'kafka',
             'properties.bootstrap.servers' = 'redpanda:29092',
-            'topic' = 'rides',
+            'topic' = 'green-trips',
             'scan.startup.mode' = 'latest-offset',
             'properties.auto.offset.reset' = 'latest',
             'format' = 'json'
