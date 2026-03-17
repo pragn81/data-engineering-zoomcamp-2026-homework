@@ -2,6 +2,34 @@ from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.table import EnvironmentSettings, StreamTableEnvironment
 
 
+def create_events_source_kafka(t_env):
+    table_name = "events"
+    source_ddl = f"""
+        CREATE TABLE {table_name} (
+            lpep_pickup_datetime VARCHAR,
+            pickup_event_timestamp AS TO_TIMESTAMP(lpep_pickup_datetime, 'yyyy-MM-dd HH:mm:ss'),
+            WATERMARK FOR pickup_event_timestamp AS pickup_event_timestamp - INTERVAL '5' SECOND,
+            lpep_dropoff_datetime VARCHAR,
+            dropoff_event_timestamp AS TO_TIMESTAMP(lpep_dropoff_datetime, 'yyyy-MM-dd HH:mm:ss'),
+            PULocationID INTEGER,
+            DOLocationID INTEGER,
+            passenger_count INTEGER,
+            trip_distance DOUBLE,
+            tip_amount DOUBLE,
+            total_amount DOUBLE
+        ) WITH (
+            'connector' = 'kafka',
+            'properties.bootstrap.servers' = 'redpanda:29092',
+            'topic' = 'green-trips',
+            'scan.startup.mode' = 'latest-offset',
+            'properties.auto.offset.reset' = 'latest',
+            'format' = 'json'
+        );
+        """
+    t_env.execute_sql(source_ddl)
+    return table_name
+
+
 def create_processed_events_sink_postgres(t_env):
     table_name = 'processed_events'
     sink_ddl = f"""
@@ -27,30 +55,6 @@ def create_processed_events_sink_postgres(t_env):
     return table_name
 
 
-def create_events_source_kafka(t_env):
-    table_name = "events"
-    source_ddl = f"""
-        CREATE TABLE {table_name} (
-            pickup_datetime BIGINT, 
-            dropoff_datetime BIGINT,
-            PULocationID INTEGER,
-            DOLocationID INTEGER,
-            passenger_count INTEGER,
-            trip_distance DOUBLE,
-            tip_amount DOUBLE,
-            total_amount DOUBLE
-        ) WITH (
-            'connector' = 'kafka',
-            'properties.bootstrap.servers' = 'redpanda:29092',
-            'topic' = 'green-trips',
-            'scan.startup.mode' = 'latest-offset',
-            'properties.auto.offset.reset' = 'latest',
-            'format' = 'json'
-        );
-        """
-    t_env.execute_sql(source_ddl)
-    return table_name
-
 def log_processing():
     # Set up the execution environment
     env = StreamExecutionEnvironment.get_execution_environment()
@@ -68,11 +72,14 @@ def log_processing():
             f"""
                     INSERT INTO {postgres_sink}
                     SELECT
+                        pickup_event_timestamp as pickup_datetime, 
+                        dropoff_event_timestamp as dropoff_datetime,
                         PULocationID,
                         DOLocationID,
+                        passenger_count,
                         trip_distance,
-                        total_amount,
-                        TO_TIMESTAMP_LTZ(tpep_pickup_datetime, 3) as pickup_datetime
+                        tip_amount,
+                        total_amount
                     FROM {source_table}
                     """
         ).wait()
